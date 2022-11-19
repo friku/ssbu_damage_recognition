@@ -1,0 +1,15 @@
+{
+	"recommendations": [
+		"ms-vscode-remote.remote-ssh",
+		"usernamehw.errorlens",
+		"tushortz.python-extended-snippets",
+		"frhtylcn.pythonsnippets",
+		"ms-vscode-remote.vscode-remote-extensionpack",
+		"mhutchie.git-graph",
+		"eamodio.gitlens",
+		"oderwat.indent-rainbow",
+		"esbenp.prettier-vscode",
+		"rvest.vs-code-prettier-eslint",
+		"formulahendry.auto-rename-tag"
+	]
+}
