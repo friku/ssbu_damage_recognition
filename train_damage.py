@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
+import yaml
 from PIL import Image
 from sklearn import preprocessing
 from sklearn.metrics import classification_report
@@ -15,6 +16,10 @@ from torch.utils.data import Dataset
 from torchvision.models import resnet34
 
 from data_loader import MyDataSet
+
+with open("config.yml", "r") as yml:
+    config = yaml.safe_load(yml)
+
 
 dataset = MyDataSet()
 
@@ -50,6 +55,7 @@ def train(epoch_num):
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
+
             total_loss += loss.item()
             total_size += data.size(0)
             loss.backward()
@@ -81,7 +87,7 @@ print(Y)
 
 print(classification_report(Y, pred))
 
-name = "exp1"
+name = config["train_name"]
 save_dir = "checkpoint/" + name + "/"
 os.makedirs(save_dir, exist_ok=True)
 model_path = save_dir + "model.pth"
