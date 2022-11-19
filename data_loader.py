@@ -1,33 +1,30 @@
-import os
 import glob
-import re 
+import re
+
 import pandas as pd
-from PIL import Image
-from torch.utils.data import Dataset
-import pandas as pd
-import os
 import torch
-import torchvision.transforms as transforms
-from torchvision.models import resnet34
 import torch.nn as nn
 import torch.optim as optim
-
-from sklearn.metrics import classification_report
+import torchvision.transforms as transforms
+from PIL import Image
 from sklearn import preprocessing
-import datetime
+from sklearn.metrics import classification_report
+from torch.utils.data import Dataset
+from torchvision.models import resnet34
+
 
 class MyDataSet(Dataset):
     def __init__(self):
-        
-        l = glob.glob('../../ssbu/dev_damage/*/*.png')
+
+        img_paths = glob.glob("../../ssbu/dev_damage/*/*.png")
         self.train_df = pd.DataFrame()
         self.images = []
         self.labels = []
         self.le = preprocessing.LabelEncoder()
 
-        for path in l:
+        for path in img_paths:
             self.images.append(path)
-            self.labels.append(re.split('[/_.]', path)[9])#ディレクトリの階層に応じて数字を変える
+            self.labels.append(re.split("[/_.]", path)[9])  # ディレクトリの階層に応じて数字を変える
             # print(re.split('[/_.]', path))
 
         self.le.fit(self.labels)
@@ -36,9 +33,9 @@ class MyDataSet(Dataset):
 
     def __len__(self):
         return len(self.images)
-    
+
     def __getitem__(self, idx):
         image = Image.open(self.images[idx])
-        image = image.convert('RGB')
+        image = image.convert("RGB")
         label = self.labels_id[idx]
         return self.transform(image), int(label)
