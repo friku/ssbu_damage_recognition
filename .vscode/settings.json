@@ -18,6 +18,12 @@
         "--max-line-length=150",
         "--ignore=E402,F841,F401,E302,E305,E722,E203",
     ],
+    "python.linting.mypyArgs": [
+        "--follow-imports=silent",
+        "--ignore-missing-imports=True",
+        "--show-column-numbers",
+        "--no-pretty"
+    ],
 	"python.formatting.provider": "black",
 	"python.formatting.blackArgs": ["--line-length=150"],
 	"python.linting.mypyEnabled": true,
