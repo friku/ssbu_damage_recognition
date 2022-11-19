@@ -2,12 +2,16 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
+import yaml
 from PIL import Image
 from torchvision import models
 from torchvision.models import resnet34
 
 from cut_damage_area import cut_damage
 from data_loader import MyDataSet
+
+with open("config.yml", "r") as yml:
+    config = yaml.safe_load(yml)
 
 # yoloのdetectにclassとして埋め込んで表示することを想定
 
@@ -16,7 +20,7 @@ from data_loader import MyDataSet
 dataset = MyDataSet()
 data_loader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
 
-weight_name = "exp1"
+weight_name = config['test_weight_name']
 
 img_path = "/home/riku/ssbu/dev_damage/05/P1_image1_000060001_2.png"
 image = Image.open(img_path)
@@ -50,26 +54,53 @@ class detect_damage:
         self.model.eval()
         with torch.no_grad():
             output = self.model(image)
-        return output.argmax()
+        return output.argmax(dim=1)
 
     def player_damage(self, image):
         im_P1, im_P2 = self.cut_damage_area.cut_damages(image)
 
-        image = self.transform(im_P2[2])
-        image = torch.reshape(image, (1, 3, 64, 64)).to(device)
+        img_tensor = []
+        for img in im_P1:
+            img = self.transform(img)
+            img = torch.reshape(img, (1, 3, 64, 64)).to(device)
+            img_tensor.append(img)
 
-        class_num = self.num_class(image)
+        for img in im_P2:
+            img = self.transform(img)
+            img = torch.reshape(img, (1, 3, 64, 64)).to(device)
+            img_tensor.append(img)
+
+        img_tensors = torch.cat(img_tensor, 0)
+
+        class_num = self.num_class(img_tensors)
         return class_num
+
+    def index2damage(self, damage_index):
+        assert len(damage_index) == 3, "damage index length must be 3"
+        damage = 0
+        for i in range(3):
+            index = damage_index[i].item()
+            if index < 10:
+                damage += index * 10 ** (2 - i)
+            elif index == 10:
+                damage = "hit"
+                return damage
+        return damage
 
 
 def main():
     dt_damage = detect_damage()
-    full_img_path = "/home/riku/ssbu/1_2_frame/image_000008305.png"
-    image = Image.open(full_img_path)
-    image = image.convert("RGB")
+    for i in range(1, 600):
+        full_img_path = f"/home/riku/ssbu/1_2_frame/image_{i:09}.png"
+        image = Image.open(full_img_path)
+        image = image.convert("RGB")
 
-    damage = dt_damage.player_damage(image)
-    print(damage)
+        damage_index = dt_damage.player_damage(image)
+
+        P1_damage = dt_damage.index2damage(damage_index[:3])
+        P2_damage = dt_damage.index2damage(damage_index[3:6])
+
+        print(f"{i}:{P1_damage}:{P2_damage}")
 
 
 if __name__ == "__main__":

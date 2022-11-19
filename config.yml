@@ -1,2 +1,3 @@
 train_dataset_dir: '/home/riku/ssbu/dev_damage'
 train_name: 'exp2'
+test_weight_name: 'exp1'
