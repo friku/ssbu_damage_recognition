@@ -98,7 +98,7 @@ class detect_damage:
 def main():
     dt_damage = detect_damage()
 
-    path = r"/home/riku/ssbu/test_not_1_2_frame.mp4"
+    path = config['test_movie_path']
     cap = cv2.VideoCapture(path)
 
     frame_num = 1
