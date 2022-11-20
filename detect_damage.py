@@ -9,6 +9,7 @@ from torchvision.models import resnet34
 
 from cut_damage_area import cut_damage
 from data_loader import MyDataSet
+import cv2
 
 with open("config.yml", "r") as yml:
     config = yaml.safe_load(yml)
@@ -96,14 +97,43 @@ class detect_damage:
 
 def main():
     dt_damage = detect_damage()
-    for i in range(1, 600):
-        full_img_path = f"/home/riku/ssbu/1_2_frame/image_{i:09}.png"
-        img = Image.open(full_img_path)
+
+    path = r"/home/riku/ssbu/test_not_1_2_frame.mp4"
+    cap = cv2.VideoCapture(path)
+
+    frame_num = 1
+    while True:
+        print("Frame: " + str(frame_num))
+        # フレーム情報取得
+        ret, img = cap.read()
+
+        # 動画が終われば処理終了
+        if ret is False:
+            break
+
+        # 動画表示
+        cv2.imshow("Video", img)
+        frame_num += 1
+        if cv2.waitKey(25) & 0xFF == ord("q"):
+            break
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(img)
         img = img.convert("RGB")
-
         P1_damage, P2_damage = dt_damage.img2damage(img)
+        print(f"{frame_num}:{P1_damage}:{P2_damage}")
 
-        print(f"{i}:{P1_damage}:{P2_damage}")
+    cap.release()
+    cv2.destroyAllWindows()
+
+    # for i in range(1, 600):
+    #     full_img_path = f"/home/riku/ssbu/1_2_frame/image_{i:09}.png"
+    #     img = Image.open(full_img_path)
+    #     img = img.convert("RGB")
+
+    #     P1_damage, P2_damage = dt_damage.img2damage(img)
+
+    #     print(f"{i}:{P1_damage}:{P2_damage}")
 
 
 if __name__ == "__main__":
