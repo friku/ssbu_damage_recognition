@@ -20,7 +20,7 @@ with open("config.yml", "r") as yml:
 dataset = MyDataSet()
 data_loader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
 
-weight_name = config['test_weight_name']
+weight_name = config["test_weight_name"]
 
 img_path = "/home/riku/ssbu/dev_damage/05/P1_image1_000060001_2.png"
 image = Image.open(img_path)
@@ -87,18 +87,21 @@ class detect_damage:
                 return damage
         return damage
 
+    def img2damage(self, img):
+        damage_index = self.player_damage(img)
+        P1_damage = self.index2damage(damage_index[:3])
+        P2_damage = self.index2damage(damage_index[3:6])
+        return P1_damage, P2_damage
+
 
 def main():
     dt_damage = detect_damage()
     for i in range(1, 600):
         full_img_path = f"/home/riku/ssbu/1_2_frame/image_{i:09}.png"
-        image = Image.open(full_img_path)
-        image = image.convert("RGB")
+        img = Image.open(full_img_path)
+        img = img.convert("RGB")
 
-        damage_index = dt_damage.player_damage(image)
-
-        P1_damage = dt_damage.index2damage(damage_index[:3])
-        P2_damage = dt_damage.index2damage(damage_index[3:6])
+        P1_damage, P2_damage = dt_damage.img2damage(img)
 
         print(f"{i}:{P1_damage}:{P2_damage}")
 
