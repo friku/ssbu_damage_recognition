@@ -1,4 +1,5 @@
 # ssbu_damage_recognition
+スマブラのダメージを認識するプログラム
 
 ## 学習方法
 config.ymlのtrain_dataset_dirにデータセットへのpathを指定する。
