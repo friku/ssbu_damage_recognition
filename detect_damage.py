@@ -122,7 +122,7 @@ def main(opt):
 
         # 動画表示
         cv2.imshow("Video", img)
-        frame_num += 1
+        
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
@@ -136,6 +136,7 @@ def main(opt):
 
         with open(txt_path + '.txt', 'a') as f:
             f.write(f'{P1_damage} {P2_damage}')
+        frame_num += 1
 
     cap.release()
     cv2.destroyAllWindows()
