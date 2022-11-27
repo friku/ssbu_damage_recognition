@@ -3,4 +3,8 @@ train_name: 'exp2'
 
 
 test_weight_name: 'exp1'
-test_movie_path: '/home/riku/ssbu/test_not_1_2_frame.mp4'
+test_movie_path: '/home/riku/ssbu/M964W8GP.mp4'
+
+project: 'runs/detect'
+name: 'exp'
+exist-ok: false

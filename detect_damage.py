@@ -10,6 +10,11 @@ from torchvision.models import resnet34
 from cut_damage_area import cut_damage
 from data_loader import MyDataSet
 import cv2
+import argparse
+import time
+from pathlib import Path
+
+from utils.general import increment_path
 
 with open("config.yml", "r") as yml:
     config = yaml.safe_load(yml)
@@ -95,11 +100,15 @@ class detect_damage:
         return P1_damage, P2_damage
 
 
-def main():
+def main(opt):
     dt_damage = detect_damage()
 
-    path = config['test_movie_path']
+    path = config["test_movie_path"]
     cap = cv2.VideoCapture(path)
+
+    # Directories
+    save_dir = increment_path(Path(opt.project) / opt.name, exist_ok=opt.exist_ok)  # increment run
+    (save_dir / 'labels').mkdir(parents=True, exist_ok=True)  # make dir
 
     frame_num = 1
     while True:
@@ -114,7 +123,7 @@ def main():
         # 動画表示
         cv2.imshow("Video", img)
         frame_num += 1
-        if cv2.waitKey(25) & 0xFF == ord("q"):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -122,6 +131,11 @@ def main():
         img = img.convert("RGB")
         P1_damage, P2_damage = dt_damage.img2damage(img)
         print(f"{frame_num}:{P1_damage}:{P2_damage}")
+        p = Path(path)  # to Path
+        txt_path = str(save_dir / "labels" / p.stem) + ("" f"_{frame_num:08}")
+
+        with open(txt_path + '.txt', 'a') as f:
+            f.write(f'{P1_damage} {P2_damage}')
 
     cap.release()
     cv2.destroyAllWindows()
@@ -137,4 +151,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--project', default='runs/detect', help='save results to project/name')
+    parser.add_argument('--name', default='exp', help='save results to project/name')
+    parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
+    opt = parser.parse_args()
+    main(opt)
